@@ -5,6 +5,7 @@ import { DashboardLayout } from './layouts/DashboardLayout'
 import { LoginPage } from './pages/LoginPage'
 import { SignupPage } from './pages/SignupPage'
 import { DashboardPage } from './pages/DashboardPage'
+import { ProposalEditorPage } from './pages/ProposalEditorPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { Spinner } from './components/ui/Spinner'
 import { ROUTES } from './constants/routes'
@@ -37,6 +38,10 @@ function AppRoutes() {
         <Route element={<DashboardLayout />}>
           <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
         </Route>
+
+        {/* Full screen editor routes */}
+        <Route path={ROUTES.PROPOSAL_NEW} element={<ProposalEditorPage />} />
+        <Route path={ROUTES.PROPOSAL_EDIT} element={<ProposalEditorPage />} />
       </Route>
 
       <Route path="/" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
