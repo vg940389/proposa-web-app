@@ -12,6 +12,10 @@ export function PublicProposalPage() {
   const [signerName, setSignerName] = useState('')
   const [signerEmail, setSignerEmail] = useState('')
   const [isSigning, setIsSigning] = useState(false)
+  const [isPaying, setIsPaying] = useState(false)
+
+  const searchParams = new URLSearchParams(window.location.search)
+  const isPaidSuccess = searchParams.get('paid') === 'true'
 
   if (loading) {
     return (
@@ -71,6 +75,30 @@ export function PublicProposalPage() {
     }
   }
 
+  const handlePayment = async () => {
+    setIsPaying(true)
+    try {
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        body: {
+          proposalId: proposal.id,
+          successUrl: window.location.origin + `/p/${token}?paid=true`,
+          cancelUrl: window.location.href,
+        },
+      })
+      if (error) throw error
+      if (data?.url) {
+        window.location.href = data.url
+      } else {
+        throw new Error('No checkout URL returned')
+      }
+    } catch (err) {
+      console.error('Payment error:', err)
+      alert('Failed to initiate payment.')
+    } finally {
+      setIsPaying(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-6">
@@ -83,7 +111,7 @@ export function PublicProposalPage() {
         ))}
 
         {/* Signing Area */}
-        {proposal.status !== 'signed' ? (
+        {(proposal.status === 'draft' || proposal.status === 'sent' || proposal.status === 'viewed') && !isPaidSuccess ? (
           <div className="bg-white rounded-xl shadow-lg border border-indigo-100 overflow-hidden mt-12">
             <div className="bg-indigo-50 border-b border-indigo-100 px-8 py-6">
               <h2 className="text-2xl font-bold text-indigo-900">Sign Proposal</h2>
@@ -122,8 +150,8 @@ export function PublicProposalPage() {
                  )}
               </div>
               <div className="flex justify-end pt-4">
-                <Button 
-                  onClick={handleSign} 
+                <Button
+                  onClick={handleSign}
                   disabled={isSigning || !signerName || !signerEmail}
                   className="bg-indigo-600 hover:bg-indigo-700"
                   size="lg"
@@ -133,6 +161,28 @@ export function PublicProposalPage() {
               </div>
             </div>
           </div>
+        ) : proposal.status === 'signed' && !isPaidSuccess ? (
+          <div className="bg-white rounded-xl shadow-lg border border-indigo-100 overflow-hidden mt-12">
+            <div className="bg-indigo-50 border-b border-indigo-100 px-8 py-6">
+              <h2 className="text-2xl font-bold text-indigo-900">Proposal Signed</h2>
+              <p className="text-indigo-700 mt-1">Thank you for accepting the proposal. Please proceed to payment.</p>
+            </div>
+            <div className="p-8 text-center space-y-6">
+              <div className="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <Button
+                onClick={handlePayment}
+                disabled={isPaying}
+                className="bg-indigo-600 hover:bg-indigo-700"
+                size="lg"
+              >
+                {isPaying ? 'Processing...' : 'Make Payment'}
+              </Button>
+            </div>
+          </div>
         ) : (
           <div className="bg-green-50 rounded-xl shadow-sm border border-green-200 p-8 text-center mt-12">
             <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -140,9 +190,9 @@ export function PublicProposalPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-green-900 mb-2">Proposal Signed!</h2>
+            <h2 className="text-2xl font-bold text-green-900 mb-2">Proposal Paid!</h2>
             <p className="text-green-700">
-              This document has been successfully signed and executed.
+              This document has been successfully signed and paid. Thank you!
             </p>
           </div>
         )}
