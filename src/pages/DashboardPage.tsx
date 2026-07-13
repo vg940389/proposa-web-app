@@ -1,3 +1,5 @@
+import { useState } from "react"
+import { GenerateProposalModal } from "../components/GenerateProposalModal"
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { Button } from '../components/ui/Button'
@@ -8,6 +10,7 @@ import { Spinner } from '../components/ui/Spinner'
 export function DashboardPage() {
   const { user } = useAuth()
   const { proposals, loading, error } = useProposals()
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false)
 
   return (
     <div>
@@ -18,14 +21,19 @@ export function DashboardPage() {
             Welcome back, {user?.email}
           </p>
         </div>
-        <Link to={ROUTES.PROPOSAL_NEW}>
-          <Button>
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            New Proposal
+        <div className="flex items-center gap-3">
+          <Button variant="secondary" onClick={() => setIsAiModalOpen(true)}>
+            ✨ Generate with AI
           </Button>
-        </Link>
+          <Link to={ROUTES.PROPOSAL_NEW}>
+            <Button>
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              New Proposal
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {loading ? (
@@ -102,6 +110,7 @@ export function DashboardPage() {
           </table>
         </div>
       )}
+      <GenerateProposalModal isOpen={isAiModalOpen} onClose={() => setIsAiModalOpen(false)} />
     </div>
   )
 }

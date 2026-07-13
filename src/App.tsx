@@ -6,6 +6,7 @@ import { LoginPage } from './pages/LoginPage'
 import { SignupPage } from './pages/SignupPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { ProposalEditorPage } from './pages/ProposalEditorPage'
+import { PublicProposalPage } from './pages/PublicProposalPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { Spinner } from './components/ui/Spinner'
 import { ROUTES } from './constants/routes'
@@ -33,6 +34,8 @@ function AppRoutes() {
     <Routes>
       <Route path={ROUTES.LOGIN} element={<LoginPage />} />
       <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
+
+      <Route path={ROUTES.PUBLIC_PROPOSAL} element={<PublicProposalPage />} />
 
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
