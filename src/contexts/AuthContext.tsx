@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -55,14 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
     if (error) throw error
     
-    if (data.user) {
-      const anySupabase = supabase as any
-      await anySupabase.from('profiles').upsert({
-        id: data.user.id,
-        email,
-        full_name: fullName,
-      })
-    }
+    // We let the Supabase database trigger (on_auth_user_created) handle creating the profiles row securely.
+    // If we try to upsert here, it will fail RLS if email confirmation is enabled on the project.
   }
 
   const signOut = async () => {
