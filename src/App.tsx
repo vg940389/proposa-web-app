@@ -7,6 +7,7 @@ import { SignupPage } from './pages/SignupPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { ProposalEditorPage } from './pages/ProposalEditorPage'
 import { PublicProposalPage } from './pages/PublicProposalPage'
+import { LandingPage } from './pages/LandingPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { Spinner } from "@/components/ui/spinner"
 import { ROUTES } from './constants/routes'
@@ -47,7 +48,7 @@ function AppRoutes() {
         <Route path={ROUTES.PROPOSAL_EDIT} element={<ProposalEditorPage />} />
       </Route>
 
-      <Route path="/" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
+      <Route path="/" element={<LandingPage />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   )

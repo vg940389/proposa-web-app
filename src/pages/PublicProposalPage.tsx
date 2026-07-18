@@ -176,13 +176,13 @@ export function PublicProposalPage() {
 
         {/* Signing Area */}
         {(proposal.status === 'draft' || proposal.status === 'sent' || proposal.status === 'viewed') ? (
-          <Card className="mt-12 border-indigo-100 shadow-md">
-            <CardHeader className="bg-indigo-50/50 border-b border-indigo-50">
-              <CardTitle className="text-2xl text-indigo-900 flex items-center gap-2">
-                <PenTool className="w-6 h-6 text-indigo-600" />
+          <Card className="mt-12 border-primary/20 shadow-lg shadow-primary/5">
+            <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-500/10 border-b border-primary/10">
+              <CardTitle className="text-2xl text-primary flex items-center gap-2">
+                <PenTool className="w-6 h-6 text-primary" />
                 Sign Proposal
               </CardTitle>
-              <CardDescription className="text-indigo-700">
+              <CardDescription className="text-primary/80 font-medium">
                 Review the document above and sign below to accept.
               </CardDescription>
             </CardHeader>
@@ -220,7 +220,7 @@ export function PublicProposalPage() {
                 <Button
                   onClick={handleSign}
                   disabled={isSigning || !signerName || !signerEmail}
-                  className="bg-indigo-600 hover:bg-indigo-700"
+                  className="bg-gradient-to-r from-primary to-blue-500 hover:from-primary/90 hover:to-blue-500/90 shadow-md"
                   size="lg"
                 >
                   {isSigning ? 'Signing...' : 'Accept and Sign'}
@@ -229,24 +229,24 @@ export function PublicProposalPage() {
             </CardContent>
           </Card>
         ) : proposal.status === 'signed' ? (
-          <Card className="mt-12 border-indigo-100 shadow-md">
-            <CardHeader className="bg-indigo-50/50 border-b border-indigo-50">
-              <CardTitle className="text-2xl text-indigo-900 flex items-center gap-2">
-                <CheckCircle2 className="w-6 h-6 text-indigo-600" />
+          <Card className="mt-12 border-primary/20 shadow-lg shadow-primary/5">
+            <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-500/10 border-b border-primary/10">
+              <CardTitle className="text-2xl text-primary flex items-center gap-2">
+                <CheckCircle2 className="w-6 h-6 text-primary" />
                 Proposal Signed
               </CardTitle>
-              <CardDescription className="text-indigo-700">
+              <CardDescription className="text-primary/80 font-medium">
                 Thank you for accepting the proposal. Please proceed to payment.
               </CardDescription>
             </CardHeader>
             <CardContent className="p-8 text-center space-y-6">
-              <div className="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto">
-                <CreditCard className="w-8 h-8" />
+              <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-blue-500/20 text-primary rounded-full flex items-center justify-center mx-auto shadow-inner">
+                <CreditCard className="w-10 h-10" />
               </div>
               <Button
                 onClick={handlePayment}
                 disabled={isPaying}
-                className="bg-indigo-600 hover:bg-indigo-700"
+                className="bg-gradient-to-r from-primary to-blue-500 hover:from-primary/90 hover:to-blue-500/90 shadow-md text-lg px-8"
                 size="lg"
               >
                 {isPaying ? 'Processing...' : 'Make Payment'}
