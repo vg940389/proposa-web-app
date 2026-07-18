@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions;
+
 CREATE TABLE public.profiles (
   id           TEXT PRIMARY KEY,
   full_name    TEXT,

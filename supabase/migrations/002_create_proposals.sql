@@ -7,7 +7,7 @@ CREATE TABLE public.proposals (
   sections         JSONB NOT NULL DEFAULT '[]',
   customer_name    TEXT,
   customer_email   TEXT,
-  public_token     TEXT UNIQUE NOT NULL DEFAULT encode(gen_random_bytes(32), 'hex'),
+  public_token     TEXT UNIQUE NOT NULL DEFAULT encode(extensions.gen_random_bytes(32), 'hex'),
   valid_until      TIMESTAMPTZ,
   total_amount     NUMERIC(12,2),
   currency         TEXT DEFAULT 'usd',
