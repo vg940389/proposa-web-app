@@ -53,7 +53,7 @@ function EditorContent() {
             status: proposal.status,
             sections: proposal.sections,
             public_token: proposal.public_token || generateId(),
-            created_by: user.uid,
+            created_by: user.id,
           })
           .select()
           .single()

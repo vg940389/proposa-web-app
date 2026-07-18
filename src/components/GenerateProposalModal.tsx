@@ -39,7 +39,7 @@ export function GenerateProposalModal({ isOpen, onClose }: GenerateProposalModal
           status: 'draft',
           sections: generated.sections || [],
           public_token: generateId(),
-          created_by: user.uid,
+          created_by: user.id,
         })
         .select()
         .single()
