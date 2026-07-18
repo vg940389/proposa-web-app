@@ -74,7 +74,7 @@ export function PricingTableBlock({ data, onChange, readOnly = false }: PricingT
               </td>
               <td className="p-4 text-right">
                 {readOnly ? (
-                  `$${item.unit_price.toFixed(2)}`
+                  `₹${item.unit_price.toFixed(2)}`
                 ) : (
                   <input
                     type="number"
@@ -85,7 +85,7 @@ export function PricingTableBlock({ data, onChange, readOnly = false }: PricingT
                 )}
               </td>
               <td className="p-4 text-right font-medium text-slate-900">
-                ${(item.qty * item.unit_price).toFixed(2)}
+                ₹{(item.qty * item.unit_price).toFixed(2)}
               </td>
               {!readOnly && (
                 <td className="p-4 text-center">
@@ -96,7 +96,7 @@ export function PricingTableBlock({ data, onChange, readOnly = false }: PricingT
           ))}
           <tr className="bg-slate-50/50 font-semibold text-slate-900 border-t-2 border-slate-200">
             <td colSpan={3} className="p-4 text-right">Total:</td>
-            <td className="p-4 text-right">${total.toFixed(2)}</td>
+            <td className="p-4 text-right">₹{total.toFixed(2)}</td>
             {!readOnly && <td></td>}
           </tr>
         </tbody>

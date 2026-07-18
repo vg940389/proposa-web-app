@@ -98,8 +98,9 @@ export interface Database {
         Row: {
           id: string
           proposal_id: string
-          stripe_session_id: string
-          stripe_payment_intent_id: string | null
+          razorpay_order_id: string
+          razorpay_payment_id: string | null
+          razorpay_signature: string | null
           amount: number
           currency: string
           status: string
@@ -109,13 +110,16 @@ export interface Database {
         }
         Insert: {
           proposal_id: string
-          stripe_session_id: string
+          razorpay_order_id: string
+          razorpay_payment_id?: string | null
+          razorpay_signature?: string | null
           amount: number
           currency?: string
           customer_email?: string | null
         }
         Update: {
-          stripe_payment_intent_id?: string | null
+          razorpay_payment_id?: string | null
+          razorpay_signature?: string | null
           status?: string
           completed_at?: string | null
         }

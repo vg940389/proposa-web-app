@@ -93,8 +93,9 @@ export interface SignatureRow {
 export interface PaymentRow {
   id: string
   proposal_id: string
-  stripe_session_id: string
-  stripe_payment_intent_id: string | null
+  razorpay_order_id: string
+  razorpay_payment_id: string | null
+  razorpay_signature: string | null
   amount: number
   currency: string
   status: 'pending' | 'completed' | 'failed' | 'refunded'

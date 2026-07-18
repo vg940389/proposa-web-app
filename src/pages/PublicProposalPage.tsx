@@ -1,21 +1,35 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { usePublicProposal } from '../hooks/usePublicProposal'
 import { BlockRenderer } from '../components/editor/BlockRenderer'
 import { Button } from '../components/ui/Button'
 import { supabase } from '../lib/supabase'
 
+declare global {
+  interface Window {
+    Razorpay: any
+  }
+}
+
 export function PublicProposalPage() {
   const { token } = useParams<{ token: string }>()
   const { proposal, loading, error, setProposal } = usePublicProposal(token)
-  
+
   const [signerName, setSignerName] = useState('')
   const [signerEmail, setSignerEmail] = useState('')
   const [isSigning, setIsSigning] = useState(false)
   const [isPaying, setIsPaying] = useState(false)
 
-  const searchParams = new URLSearchParams(window.location.search)
-  const isPaidSuccess = searchParams.get('paid') === 'true'
+  // Load Razorpay script
+  useEffect(() => {
+    const script = document.createElement('script')
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+    script.async = true
+    document.body.appendChild(script)
+    return () => {
+      document.body.removeChild(script)
+    }
+  }, [])
 
   if (loading) {
     return (
@@ -78,22 +92,64 @@ export function PublicProposalPage() {
   const handlePayment = async () => {
     setIsPaying(true)
     try {
-      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-        body: {
-          proposalId: proposal.id,
-          successUrl: window.location.origin + `/p/${token}?paid=true`,
-          cancelUrl: window.location.href,
-        },
-      })
-      if (error) throw error
-      if (data?.url) {
-        window.location.href = data.url
-      } else {
-        throw new Error('No checkout URL returned')
+      if (!window.Razorpay) {
+        throw new Error('Razorpay SDK failed to load. Are you online?')
       }
-    } catch (err) {
-      console.error('Payment error:', err)
-      alert('Failed to initiate payment.')
+
+      // 1. Create order on the server
+      const { data: orderData, error: orderError } = await supabase.functions.invoke(
+        'create-razorpay-order',
+        { body: { proposalId: proposal.id } }
+      )
+      if (orderError) throw orderError
+      if (!orderData?.orderId) throw new Error('No order ID returned')
+
+      // 2. Open Razorpay checkout modal
+      await new Promise<void>((resolve, reject) => {
+        const options = {
+          key: orderData.keyId,
+          amount: orderData.amount,
+          currency: orderData.currency,
+          name: proposal.title || 'Proposal Payment',
+          description: `Payment for ${proposal.title}`,
+          order_id: orderData.orderId,
+          prefill: { email: proposal.customer_email ?? '' },
+          handler: async (response: {
+            razorpay_payment_id: string
+            razorpay_order_id: string
+            razorpay_signature: string
+          }) => {
+            try {
+              // 3. Verify payment on server
+              const { error: verifyError } = await supabase.functions.invoke(
+                'verify-razorpay-payment',
+                {
+                  body: {
+                    proposalId: proposal.id,
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_signature: response.razorpay_signature,
+                  },
+                }
+              )
+              if (verifyError) throw verifyError
+              setProposal({ ...proposal, status: 'paid' })
+              resolve()
+            } catch (err) {
+              reject(err)
+            }
+          },
+          modal: {
+            ondismiss: () => reject(new Error('Payment cancelled')),
+          },
+        }
+        new window.Razorpay(options).open()
+      })
+    } catch (err: any) {
+      if (err.message !== 'Payment cancelled') {
+        console.error('Payment error:', err)
+        alert(`Failed to initiate payment: ${err.message || 'Unknown error'}`)
+      }
     } finally {
       setIsPaying(false)
     }
@@ -102,7 +158,7 @@ export function PublicProposalPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-6">
-        
+
         {/* Document Content */}
         {proposal.sections && proposal.sections.map((block) => (
           <div key={block.id} className="shadow-sm rounded-xl overflow-hidden">
@@ -111,7 +167,7 @@ export function PublicProposalPage() {
         ))}
 
         {/* Signing Area */}
-        {(proposal.status === 'draft' || proposal.status === 'sent' || proposal.status === 'viewed') && !isPaidSuccess ? (
+        {(proposal.status === 'draft' || proposal.status === 'sent' || proposal.status === 'viewed') ? (
           <div className="bg-white rounded-xl shadow-lg border border-indigo-100 overflow-hidden mt-12">
             <div className="bg-indigo-50 border-b border-indigo-100 px-8 py-6">
               <h2 className="text-2xl font-bold text-indigo-900">Sign Proposal</h2>
@@ -161,7 +217,7 @@ export function PublicProposalPage() {
               </div>
             </div>
           </div>
-        ) : proposal.status === 'signed' && !isPaidSuccess ? (
+        ) : proposal.status === 'signed' ? (
           <div className="bg-white rounded-xl shadow-lg border border-indigo-100 overflow-hidden mt-12">
             <div className="bg-indigo-50 border-b border-indigo-100 px-8 py-6">
               <h2 className="text-2xl font-bold text-indigo-900">Proposal Signed</h2>
