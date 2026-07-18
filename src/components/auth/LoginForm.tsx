@@ -1,8 +1,10 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
-import { Button } from '../ui/Button'
-import { Input } from '../ui/Input'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Loader2 } from 'lucide-react'
+import { Input } from '@/components/ui/input'
 import { ROUTES } from '../../constants/routes'
 
 export function LoginForm() {
@@ -31,23 +33,30 @@ export function LoginForm() {
       {error && (
         <div className="p-3 rounded-lg bg-red-50 text-sm text-red-600">{error}</div>
       )}
-      <Input
-        label="Email"
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-        autoComplete="email"
-      />
-      <Input
-        label="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-        autoComplete="current-password"
-      />
-      <Button type="submit" loading={loading} className="w-full">
+      <div className="space-y-2">
+        <Label htmlFor="email-input">Email</Label>
+        <Input
+          id="email-input"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoComplete="email"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="password-input">Password</Label>
+        <Input
+          id="password-input"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          autoComplete="current-password"
+        />
+      </div>
+      <Button type="submit" disabled={loading} className="w-full">
+        {loading && <Loader2 className="animate-spin mr-2 h-4 w-4" />}
         Sign in
       </Button>
       <p className="text-center text-sm text-gray-500">

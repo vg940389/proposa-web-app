@@ -5,9 +5,13 @@ import { useProposalEditor, ProposalEditorProvider } from '../contexts/ProposalE
 import { useProposal } from '../hooks/useProposal'
 import { supabase } from '../lib/supabase'
 import { ROUTES } from '../constants/routes'
-import { Button } from '../components/ui/Button'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
 import { generateId } from '../lib/utils'
 import { BlockRenderer } from '../components/editor/BlockRenderer'
+import { ArrowLeft, ArrowUp, ArrowDown, X, Plus } from 'lucide-react'
 
 function EditorContent() {
   const { id } = useParams<{ id: string }>()
@@ -93,20 +97,23 @@ function EditorContent() {
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-4">
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => navigate(ROUTES.DASHBOARD)}
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-500 hover:text-gray-900 -ml-3"
           >
-            &larr; Back
-          </button>
-          <input
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+          <Input
             type="text"
             value={proposal.title || ''}
             onChange={(e) => dispatch({ type: 'UPDATE_METADATA', payload: { title: e.target.value } })}
-            className="text-xl font-bold bg-transparent border-none focus:ring-0 p-0 text-gray-900 placeholder-gray-400"
+            className="text-xl font-bold bg-transparent border-none focus-visible:ring-0 px-0 h-auto shadow-none w-80 text-gray-900 placeholder-gray-400"
             placeholder="Proposal Title"
           />
-          {hasUnsavedChanges && <span className="text-sm text-amber-500">Unsaved changes</span>}
+          {hasUnsavedChanges && <span className="text-sm text-amber-500 font-medium">Unsaved changes</span>}
         </div>
         <div className="flex items-center gap-3">
           <Button variant="secondary">Preview</Button>
@@ -123,23 +130,21 @@ function EditorContent() {
           <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">Details</h2>
 
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Client Name</label>
-              <input
+            <div className="space-y-2">
+              <Label>Client Name</Label>
+              <Input
                 type="text"
                 value={proposal.customer_name || ''}
                 onChange={(e) => dispatch({ type: 'UPDATE_METADATA', payload: { customer_name: e.target.value } })}
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                 placeholder="Acme Corp"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Client Email</label>
-              <input
+            <div className="space-y-2">
+              <Label>Client Email</Label>
+              <Input
                 type="email"
                 value={proposal.customer_email || ''}
                 onChange={(e) => dispatch({ type: 'UPDATE_METADATA', payload: { customer_email: e.target.value } })}
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                 placeholder="client@acme.com"
               />
             </div>
@@ -153,13 +158,15 @@ function EditorContent() {
               { type: 'pricing_table', label: 'Pricing Table' },
               { type: 'signature_block', label: 'Signature' }
             ].map((blockType) => (
-              <button
+              <Button
                 key={blockType.type}
+                variant="outline"
+                className="w-full justify-start text-muted-foreground hover:text-foreground"
                 onClick={() => dispatch({ type: 'ADD_BLOCK', payload: { type: blockType.type as any, data: {} } })}
-                className="w-full text-left px-4 py-2 border border-gray-200 rounded-lg hover:border-blue-500 hover:text-blue-600 transition-colors text-sm font-medium text-gray-700 bg-white"
               >
-                + {blockType.label}
-              </button>
+                <Plus className="w-4 h-4 mr-2" />
+                {blockType.label}
+              </Button>
             ))}
           </div>
         </aside>
@@ -168,41 +175,51 @@ function EditorContent() {
         <div className="flex-1 overflow-y-auto p-8 bg-gray-50">
           <div className="max-w-4xl mx-auto space-y-6 pb-32">
             {(!proposal.sections || proposal.sections.length === 0) ? (
-              <div className="text-center py-20 bg-white border border-gray-200 border-dashed rounded-xl">
-                <p className="text-gray-500">Document is empty. Add blocks from the sidebar.</p>
-              </div>
+              <Card className="border-dashed border-2">
+                <CardContent className="py-20 text-center">
+                  <p className="text-muted-foreground">Document is empty. Add blocks from the sidebar.</p>
+                </CardContent>
+              </Card>
             ) : (
               proposal.sections.map((block, index) => (
-                <div key={block.id} className="bg-white border border-gray-200 rounded-xl p-6 relative group shadow-sm">
-                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                    <button
+                <Card key={block.id} className="relative group hover:shadow-md transition-shadow">
+                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-white/90 backdrop-blur shadow-sm border border-gray-100 rounded-md p-1 z-10">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-gray-500"
                       onClick={() => dispatch({ type: 'REORDER_BLOCKS', payload: { startIndex: index, endIndex: Math.max(0, index - 1) } })}
                       disabled={index === 0}
-                      className="p-1 text-gray-400 hover:text-gray-700 disabled:opacity-50"
                     >
-                      &uarr;
-                    </button>
-                    <button
+                      <ArrowUp className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-gray-500"
                       onClick={() => dispatch({ type: 'REORDER_BLOCKS', payload: { startIndex: index, endIndex: Math.min(proposal.sections!.length - 1, index + 1) } })}
                       disabled={index === proposal.sections!.length - 1}
-                      className="p-1 text-gray-400 hover:text-gray-700 disabled:opacity-50"
                     >
-                      &darr;
-                    </button>
-                    <button
+                      <ArrowDown className="w-4 h-4" />
+                    </Button>
+                    <div className="w-px h-4 bg-gray-200 mx-1" />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
                       onClick={() => dispatch({ type: 'REMOVE_BLOCK', payload: block.id })}
-                      className="p-1 text-red-400 hover:text-red-600 ml-2"
                     >
-                      &#10005;
-                    </button>
+                      <X className="w-4 h-4" />
+                    </Button>
                   </div>
 
-                  <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">
-                    {block.type.replace('_', ' ')}
-                  </div>
-
-                  <BlockRenderer block={block} />
-                </div>
+                  <CardContent className="p-6">
+                    <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">
+                      {block.type.replace('_', ' ')}
+                    </div>
+                    <BlockRenderer block={block} />
+                  </CardContent>
+                </Card>
               ))
             )}
           </div>

@@ -2,8 +2,12 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { usePublicProposal } from '../hooks/usePublicProposal'
 import { BlockRenderer } from '../components/editor/BlockRenderer'
-import { Button } from '../components/ui/Button'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { supabase } from '../lib/supabase'
+import { AlertCircle, CheckCircle2, CreditCard, PenTool } from 'lucide-react'
 
 declare global {
   interface Window {
@@ -42,13 +46,15 @@ export function PublicProposalPage() {
   if (error || !proposal) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="bg-white p-8 rounded-xl shadow-sm text-center max-w-md w-full">
-          <div className="text-red-500 text-4xl mb-4">⚠️</div>
-          <h1 className="text-xl font-bold text-gray-900 mb-2">Proposal not found</h1>
-          <p className="text-gray-500">
-            This document may have been removed or the link is invalid.
-          </p>
-        </div>
+        <Card className="max-w-md w-full border-red-100 shadow-sm">
+          <CardContent className="pt-6 text-center">
+            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+            <h1 className="text-xl font-bold text-gray-900 mb-2">Proposal not found</h1>
+            <p className="text-muted-foreground">
+              This document may have been removed or the link is invalid.
+            </p>
+          </CardContent>
+        </Card>
       </div>
     )
   }
@@ -161,37 +167,42 @@ export function PublicProposalPage() {
 
         {/* Document Content */}
         {proposal.sections && proposal.sections.map((block) => (
-          <div key={block.id} className="shadow-sm rounded-xl overflow-hidden">
-            <BlockRenderer block={block} readOnly={true} />
-          </div>
+          <Card key={block.id} className="shadow-sm overflow-hidden">
+            <CardContent className="p-0">
+              <BlockRenderer block={block} readOnly={true} />
+            </CardContent>
+          </Card>
         ))}
 
         {/* Signing Area */}
         {(proposal.status === 'draft' || proposal.status === 'sent' || proposal.status === 'viewed') ? (
-          <div className="bg-white rounded-xl shadow-lg border border-indigo-100 overflow-hidden mt-12">
-            <div className="bg-indigo-50 border-b border-indigo-100 px-8 py-6">
-              <h2 className="text-2xl font-bold text-indigo-900">Sign Proposal</h2>
-              <p className="text-indigo-700 mt-1">Review the document above and sign below to accept.</p>
-            </div>
-            <div className="p-8 space-y-6">
+          <Card className="mt-12 border-indigo-100 shadow-md">
+            <CardHeader className="bg-indigo-50/50 border-b border-indigo-50">
+              <CardTitle className="text-2xl text-indigo-900 flex items-center gap-2">
+                <PenTool className="w-6 h-6 text-indigo-600" />
+                Sign Proposal
+              </CardTitle>
+              <CardDescription className="text-indigo-700">
+                Review the document above and sign below to accept.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-8 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                  <input
+                <div className="space-y-2">
+                  <Label>Full Name</Label>
+                  <Input
                     type="text"
                     value={signerName}
                     onChange={(e) => setSignerName(e.target.value)}
-                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     placeholder="Jane Doe"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                  <input
+                <div className="space-y-2">
+                  <Label>Email Address</Label>
+                  <Input
                     type="email"
                     value={signerEmail}
                     onChange={(e) => setSignerEmail(e.target.value)}
-                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     placeholder="jane@example.com"
                   />
                 </div>
@@ -202,7 +213,7 @@ export function PublicProposalPage() {
                      {signerName}
                    </div>
                  ) : (
-                   <p className="text-gray-400 italic">Type your name above to generate a signature</p>
+                   <p className="text-muted-foreground italic">Type your name above to generate a signature</p>
                  )}
               </div>
               <div className="flex justify-end pt-4">
@@ -215,19 +226,22 @@ export function PublicProposalPage() {
                   {isSigning ? 'Signing...' : 'Accept and Sign'}
                 </Button>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         ) : proposal.status === 'signed' ? (
-          <div className="bg-white rounded-xl shadow-lg border border-indigo-100 overflow-hidden mt-12">
-            <div className="bg-indigo-50 border-b border-indigo-100 px-8 py-6">
-              <h2 className="text-2xl font-bold text-indigo-900">Proposal Signed</h2>
-              <p className="text-indigo-700 mt-1">Thank you for accepting the proposal. Please proceed to payment.</p>
-            </div>
-            <div className="p-8 text-center space-y-6">
+          <Card className="mt-12 border-indigo-100 shadow-md">
+            <CardHeader className="bg-indigo-50/50 border-b border-indigo-50">
+              <CardTitle className="text-2xl text-indigo-900 flex items-center gap-2">
+                <CheckCircle2 className="w-6 h-6 text-indigo-600" />
+                Proposal Signed
+              </CardTitle>
+              <CardDescription className="text-indigo-700">
+                Thank you for accepting the proposal. Please proceed to payment.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-8 text-center space-y-6">
               <div className="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <CreditCard className="w-8 h-8" />
               </div>
               <Button
                 onClick={handlePayment}
@@ -237,20 +251,20 @@ export function PublicProposalPage() {
               >
                 {isPaying ? 'Processing...' : 'Make Payment'}
               </Button>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         ) : (
-          <div className="bg-green-50 rounded-xl shadow-sm border border-green-200 p-8 text-center mt-12">
-            <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-green-900 mb-2">Proposal Paid!</h2>
-            <p className="text-green-700">
-              This document has been successfully signed and paid. Thank you!
-            </p>
-          </div>
+          <Card className="mt-12 border-green-200 shadow-sm bg-green-50/50">
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 className="w-8 h-8" />
+              </div>
+              <h2 className="text-2xl font-bold text-green-900 mb-2">Proposal Paid!</h2>
+              <p className="text-green-700">
+                This document has been successfully signed and paid. Thank you!
+              </p>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>

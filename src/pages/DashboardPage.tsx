@@ -2,10 +2,13 @@ import { useState } from "react"
 import { GenerateProposalModal } from "../components/GenerateProposalModal"
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { Button } from '../components/ui/Button'
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Plus, Sparkles, Inbox } from "lucide-react"
 import { ROUTES } from '../constants/routes'
 import { useProposals } from '../hooks/useProposals'
-import { Spinner } from '../components/ui/Spinner'
+import { Spinner } from "@/components/ui/spinner"
 
 export function DashboardPage() {
   const { user } = useAuth()
@@ -16,20 +19,19 @@ export function DashboardPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Proposals</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Proposals</h1>
+          <p className="text-muted-foreground mt-1">
             Welcome back, {user?.email}
           </p>
         </div>
         <div className="flex items-center gap-3">
           <Button variant="secondary" onClick={() => setIsAiModalOpen(true)}>
-            ✨ Generate with AI
+            <Sparkles className="w-4 h-4 mr-2 text-amber-500" />
+            Generate with AI
           </Button>
           <Link to={ROUTES.PROPOSAL_NEW}>
             <Button>
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
+              <Plus className="w-4 h-4 mr-2" />
               New Proposal
             </Button>
           </Link>
@@ -45,70 +47,73 @@ export function DashboardPage() {
           Failed to load proposals: {error.message}
         </div>
       ) : proposals.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <h3 className="mt-4 text-lg font-medium text-gray-900">No proposals yet</h3>
-          <p className="mt-2 text-sm text-gray-500">
-            Create your first proposal to get started.
-          </p>
-          <div className="mt-6">
-            <Link to={ROUTES.PROPOSAL_NEW}>
-              <Button>Create a proposal</Button>
-            </Link>
-          </div>
-        </div>
+        <Card className="border-dashed">
+          <CardContent className="flex flex-col items-center justify-center py-16">
+            <div className="p-4 bg-muted rounded-full mb-4">
+              <Inbox className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold">No proposals yet</h3>
+            <p className="text-muted-foreground text-sm max-w-sm text-center mt-1 mb-6">
+              Create your first proposal manually or use our AI assistant to generate one in seconds.
+            </p>
+            <div className="flex items-center gap-3">
+              <Button variant="outline" onClick={() => setIsAiModalOpen(true)}>
+                <Sparkles className="w-4 h-4 mr-2 text-amber-500" />
+                AI Generate
+              </Button>
+              <Link to={ROUTES.PROPOSAL_NEW}>
+                <Button>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Manually
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
       ) : (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Title
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Client
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {proposals.map((proposal) => (
-                <tr key={proposal.id} className="hover:bg-gray-50 cursor-pointer">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <Link to={`/proposals/${proposal.id}`} className="block">
-                      <div className="text-sm font-medium text-gray-900">{proposal.title || 'Untitled Proposal'}</div>
-                    </Link>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <Link to={`/proposals/${proposal.id}`} className="block">
-                      <div className="text-sm text-gray-900">{proposal.customer_name || '-'}</div>
-                      <div className="text-sm text-gray-500">{proposal.customer_email || '-'}</div>
-                    </Link>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <Link to={`/proposals/${proposal.id}`} className="block">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                        {proposal.status}
-                      </span>
-                    </Link>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <Link to={`/proposals/${proposal.id}`} className="block">
-                      {new Date(proposal.created_at).toLocaleDateString()}
-                    </Link>
-                  </td>
+        <Card>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="bg-muted/50 text-muted-foreground border-b">
+                <tr>
+                  <th className="h-10 px-4 font-medium">Title</th>
+                  <th className="h-10 px-4 font-medium">Client</th>
+                  <th className="h-10 px-4 font-medium">Status</th>
+                  <th className="h-10 px-4 font-medium">Date</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y">
+                {proposals.map((proposal) => (
+                  <tr key={proposal.id} className="hover:bg-muted/50 transition-colors group cursor-pointer">
+                    <td className="px-4 py-3">
+                      <Link to={`/proposals/${proposal.id}`} className="block font-medium text-foreground">
+                        {proposal.title || 'Untitled Proposal'}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Link to={`/proposals/${proposal.id}`} className="block">
+                        <div className="font-medium">{proposal.customer_name || '-'}</div>
+                        <div className="text-muted-foreground text-xs">{proposal.customer_email || '-'}</div>
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Link to={`/proposals/${proposal.id}`} className="block">
+                        <Badge variant={proposal.status === 'signed' || proposal.status === 'paid' ? 'default' : proposal.status === 'sent' ? 'secondary' : 'outline'}>
+                          {proposal.status}
+                        </Badge>
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      <Link to={`/proposals/${proposal.id}`} className="block">
+                        {new Date(proposal.created_at).toLocaleDateString()}
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       )}
       <GenerateProposalModal isOpen={isAiModalOpen} onClose={() => setIsAiModalOpen(false)} />
     </div>

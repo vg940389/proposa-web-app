@@ -8,7 +8,7 @@ import { DashboardPage } from './pages/DashboardPage'
 import { ProposalEditorPage } from './pages/ProposalEditorPage'
 import { PublicProposalPage } from './pages/PublicProposalPage'
 import { NotFoundPage } from './pages/NotFoundPage'
-import { Spinner } from './components/ui/Spinner'
+import { Spinner } from "@/components/ui/spinner"
 import { ROUTES } from './constants/routes'
 
 function ProtectedRoute() {
