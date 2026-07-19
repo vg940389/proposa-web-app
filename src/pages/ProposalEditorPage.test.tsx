@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { ProposalEditorPage } from './ProposalEditorPage'
 import { useAuth } from '../contexts/AuthContext'
 import { useProposal } from '../hooks/useProposal'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { MemoryRouter } from 'react-router-dom'
 
 // Mock react-router-dom useParams and useNavigate
 const mockNavigate = vi.fn()
@@ -71,7 +71,7 @@ describe('ProposalEditorPage', () => {
       user: { id: 'user-123' },
       loading: false,
       signOut: vi.fn()
-    })
+    } as any)
     vi.mocked(useProposal).mockReturnValue({
       proposal: null,
       loading: false,

@@ -1,9 +1,8 @@
 import { useState, useCallback } from 'react'
 import { uploadProposalPdf } from '@/lib/storage'
 import { useAuth } from '@/contexts/AuthContext'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Upload, FileText, AlertCircle, Loader2 } from 'lucide-react'
+import { Upload, AlertCircle, Loader2 } from 'lucide-react'
 
 interface PdfUploaderProps {
   onUploadSuccess: (url: string) => void

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { Document, Page, pdfjs } from 'react-pdf'
 import {
   DndContext,
@@ -14,7 +14,6 @@ import { useProposalEditor } from '@/contexts/ProposalEditorContext'
 import type { PdfField, PdfFieldType } from '@/types/proposal'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { Switch } from '@base-ui/react/switch' // We'll double-check this switch primitive import or write a custom switch
 import {
   FileText,
   PenTool,
@@ -23,8 +22,6 @@ import {
   Trash2,
   ZoomIn,
   ZoomOut,
-  ChevronLeft,
-  ChevronRight,
   Sparkles,
   HelpCircle
 } from 'lucide-react'
@@ -160,7 +157,6 @@ function PlacedField({
   return (
     <div
       ref={setNodeRef}
-      style={style}
       data-testid={`placed-field-${field.id}`}
       onClick={(e) => {
         e.stopPropagation()
@@ -232,10 +228,10 @@ export function PdfEditor({ documentUrl }: PdfEditorProps) {
     const pageNumber = parseInt(pageId.split('-')[1])
     const pageElement = document.getElementById(pageId)
 
-    if (!pageElement || !event.rects.translated) return
+    if (!pageElement || !(event as any).rects?.translated) return
 
     const pageRect = pageElement.getBoundingClientRect()
-    const draggedRect = event.rects.translated
+    const draggedRect = (event as any).rects.translated
 
     // Calculate relative coordinates in percentages
     const x = ((draggedRect.left - pageRect.left) / pageRect.width) * 100

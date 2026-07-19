@@ -20,7 +20,7 @@ vi.mock('@dnd-kit/core', () => ({
     transform: null,
     isDragging: false
   }),
-  useDroppable: ({ id }: any) => ({
+  useDroppable: () => ({
     setNodeRef: () => {}
   }),
   MouseSensor: class {},

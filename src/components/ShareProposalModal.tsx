@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Copy, Check, Mail, ExternalLink } from "lucide-react"
+import { Copy, Check, Mail } from "lucide-react"
 import { supabase } from '../lib/supabase'
 
 interface ShareProposalModalProps {
@@ -31,7 +31,7 @@ export function ShareProposalModal({ isOpen, onClose, proposalId, publicToken, c
     setSending(true)
     try {
       // Update status to 'sent'
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('proposals')
         .update({ status: 'sent' })
         .eq('id', proposalId)

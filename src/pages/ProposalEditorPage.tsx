@@ -11,7 +11,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { generateId } from '../lib/utils'
 import { BlockRenderer } from '../components/editor/BlockRenderer'
-import { ArrowLeft, ArrowUp, ArrowDown, X, Plus, Send, BookOpen, FileUp, Sparkles, FileText } from 'lucide-react'
+import { ArrowLeft, ArrowUp, ArrowDown, X, Plus, Send, BookOpen, FileUp } from 'lucide-react'
 import { ShareProposalModal } from '../components/ShareProposalModal'
 import { PdfUploader } from '../components/pdf/PdfUploader'
 import { PdfEditor } from '../components/pdf/PdfEditor'

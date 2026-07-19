@@ -2,7 +2,6 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { PublicProposalPage } from './PublicProposalPage'
 import { usePublicProposal } from '../hooks/usePublicProposal'
-import { supabase } from '../lib/supabase'
 import { MemoryRouter } from 'react-router-dom'
 import { useEffect } from 'react'
 

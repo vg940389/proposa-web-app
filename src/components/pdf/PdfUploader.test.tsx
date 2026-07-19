@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { PdfUploader } from './PdfUploader'
 import { useAuth } from '@/contexts/AuthContext'
@@ -26,7 +26,7 @@ describe('PdfUploader', () => {
   })
 
   it('renders the upload zone with instructions', () => {
-    vi.mocked(useAuth).mockReturnValue({ user: { id: 'user-123' }, loading: false, signOut: vi.fn() })
+    vi.mocked(useAuth).mockReturnValue({ user: { id: 'user-123' } as any, loading: false, signOut: vi.fn() } as any)
 
     render(<PdfUploader onUploadSuccess={mockOnUploadSuccess} />)
 
@@ -35,7 +35,7 @@ describe('PdfUploader', () => {
   })
 
   it('displays an error if a non-PDF file is selected', async () => {
-    vi.mocked(useAuth).mockReturnValue({ user: { id: 'user-123' }, loading: false, signOut: vi.fn() })
+    vi.mocked(useAuth).mockReturnValue({ user: { id: 'user-123' } as any, loading: false, signOut: vi.fn() } as any)
 
     const { container } = render(<PdfUploader onUploadSuccess={mockOnUploadSuccess} />)
 
@@ -51,7 +51,7 @@ describe('PdfUploader', () => {
   })
 
   it('displays an error if the PDF file exceeds 10MB limit', async () => {
-    vi.mocked(useAuth).mockReturnValue({ user: { id: 'user-123' }, loading: false, signOut: vi.fn() })
+    vi.mocked(useAuth).mockReturnValue({ user: { id: 'user-123' } as any, loading: false, signOut: vi.fn() } as any)
 
     const { container } = render(<PdfUploader onUploadSuccess={mockOnUploadSuccess} />)
 
@@ -69,7 +69,7 @@ describe('PdfUploader', () => {
   })
 
   it('calls uploadProposalPdf and onUploadSuccess when logged in and a valid PDF is uploaded', async () => {
-    vi.mocked(useAuth).mockReturnValue({ user: { id: 'user-123' }, loading: false, signOut: vi.fn() })
+    vi.mocked(useAuth).mockReturnValue({ user: { id: 'user-123' } as any, loading: false, signOut: vi.fn() } as any)
     vi.mocked(uploadProposalPdf).mockResolvedValue('https://supabase-bucket-url.com/proposal.pdf')
 
     const { container } = render(<PdfUploader onUploadSuccess={mockOnUploadSuccess} />)
@@ -86,7 +86,7 @@ describe('PdfUploader', () => {
   })
 
   it('performs mock upload when user is not logged in', async () => {
-    vi.mocked(useAuth).mockReturnValue({ user: null, loading: false, signOut: vi.fn() })
+    vi.mocked(useAuth).mockReturnValue({ user: null, loading: false, signOut: vi.fn() } as any)
 
     const { container } = render(<PdfUploader onUploadSuccess={mockOnUploadSuccess} />)
 
@@ -101,7 +101,7 @@ describe('PdfUploader', () => {
   })
 
   it('handles upload errors gracefully', async () => {
-    vi.mocked(useAuth).mockReturnValue({ user: { id: 'user-123' }, loading: false, signOut: vi.fn() })
+    vi.mocked(useAuth).mockReturnValue({ user: { id: 'user-123' } as any, loading: false, signOut: vi.fn() } as any)
     vi.mocked(uploadProposalPdf).mockRejectedValue(new Error('Network failure'))
 
     const { container } = render(<PdfUploader onUploadSuccess={mockOnUploadSuccess} />)

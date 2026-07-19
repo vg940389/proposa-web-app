@@ -14,7 +14,6 @@ import {
   PenTool,
   Calendar,
   Type,
-  Maximize2,
   ZoomIn,
   ZoomOut,
   FileText,
