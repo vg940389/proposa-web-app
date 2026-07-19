@@ -59,12 +59,29 @@ export interface SpacerData {
 
 export type ProposalStatus = 'draft' | 'sent' | 'viewed' | 'signed' | 'paid' | 'declined'
 
+export type PdfFieldType = 'signature' | 'date' | 'text'
+
+export interface PdfField {
+  id: string
+  type: PdfFieldType
+  pageNumber: number
+  x: number // percentage 0-100
+  y: number // percentage 0-100
+  width: number
+  height: number
+  required: boolean
+  value?: string // to store the value filled in by the recipient/signer
+}
+
 export interface ProposalRow {
   id: string
   created_by: string
   title: string
   status: ProposalStatus
   sections: SectionBlock[]
+  document_type: 'block' | 'pdf'
+  document_url: string | null
+  pdf_fields: PdfField[]
   customer_name: string | null
   customer_email: string | null
   public_token: string

@@ -32,7 +32,7 @@
   --chart-3: #10b981;
   --chart-4: #f59e0b;
   --chart-5: #ef4444;
-  --radius: 0.75rem;
+  --radius: 1rem;
   --sidebar: #f8fafc;
   --sidebar-foreground: #0f172a;
   --sidebar-primary: #4f46e5;
@@ -143,4 +143,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--background);
   color: var(--foreground);
+}
+
+@utility glass {
+  backdrop-filter: blur(24px);
+  background-color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark @utility glass {
+  background-color: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(30, 41, 59, 0.5);
 }

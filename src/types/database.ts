@@ -32,6 +32,9 @@ export interface Database {
           title: string
           status: string
           sections: unknown
+          document_type: string
+          document_url: string | null
+          pdf_fields: unknown
           customer_name: string | null
           customer_email: string | null
           public_token: string
@@ -50,6 +53,9 @@ export interface Database {
           title?: string
           status?: string
           sections?: unknown
+          document_type?: string
+          document_url?: string | null
+          pdf_fields?: unknown
           customer_name?: string | null
           customer_email?: string | null
           valid_until?: string | null
@@ -61,6 +67,9 @@ export interface Database {
           title?: string
           status?: string
           sections?: unknown
+          document_type?: string
+          document_url?: string | null
+          pdf_fields?: unknown
           customer_name?: string | null
           customer_email?: string | null
           valid_until?: string | null

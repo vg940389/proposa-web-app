@@ -38,14 +38,14 @@ function AppRoutes() {
 
       <Route path={ROUTES.PUBLIC_PROPOSAL} element={<PublicProposalPage />} />
 
+      {/* Full screen editor routes - Temporary bypass for UI review */}
+      <Route path={ROUTES.PROPOSAL_NEW} element={<ProposalEditorPage />} />
+      <Route path={ROUTES.PROPOSAL_EDIT} element={<ProposalEditorPage />} />
+
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
           <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
         </Route>
-
-        {/* Full screen editor routes */}
-        <Route path={ROUTES.PROPOSAL_NEW} element={<ProposalEditorPage />} />
-        <Route path={ROUTES.PROPOSAL_EDIT} element={<ProposalEditorPage />} />
       </Route>
 
       <Route path="/" element={<LandingPage />} />

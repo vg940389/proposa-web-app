@@ -11,8 +11,10 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { generateId } from '../lib/utils'
 import { BlockRenderer } from '../components/editor/BlockRenderer'
-import { ArrowLeft, ArrowUp, ArrowDown, X, Plus, Send } from 'lucide-react'
+import { ArrowLeft, ArrowUp, ArrowDown, X, Plus, Send, BookOpen, FileUp, Sparkles, FileText } from 'lucide-react'
 import { ShareProposalModal } from '../components/ShareProposalModal'
+import { PdfUploader } from '../components/pdf/PdfUploader'
+import { PdfEditor } from '../components/pdf/PdfEditor'
 
 function EditorContent() {
   const { id } = useParams<{ id: string }>()
@@ -58,6 +60,9 @@ function EditorContent() {
             customer_email: proposal.customer_email,
             status: proposal.status,
             sections: proposal.sections,
+            document_type: proposal.document_type || 'block',
+            document_url: proposal.document_url || null,
+            pdf_fields: proposal.pdf_fields || [],
             public_token: proposal.public_token || generateId(),
             created_by: user.id,
           })
@@ -77,6 +82,9 @@ function EditorContent() {
             customer_email: proposal.customer_email,
             status: proposal.status,
             sections: proposal.sections,
+            document_type: proposal.document_type || 'block',
+            document_url: proposal.document_url || null,
+            pdf_fields: proposal.pdf_fields || [],
           })
           .eq('id', id)
 
@@ -136,117 +144,240 @@ function EditorContent() {
       </header>
 
       {/* Main workspace */}
-      <main className="flex-1 flex overflow-hidden">
-        {/* Editor sidebar / Metadata */}
-        <aside className="w-80 bg-white border-r border-gray-200 p-6 overflow-y-auto">
-          <h2 className="text-sm font-bold text-primary uppercase tracking-wider mb-4 flex items-center gap-2">
-            <span className="bg-primary/10 p-1 rounded">Details</span>
-          </h2>
-
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label className="text-foreground/80 font-medium">Client Name</Label>
-              <Input
-                type="text"
-                value={proposal.customer_name || ''}
-                onChange={(e) => dispatch({ type: 'UPDATE_METADATA', payload: { customer_name: e.target.value } })}
-                placeholder="Acme Corp"
-                className="focus-visible:ring-primary/50"
-              />
+      {!proposal.document_type ? (
+        <div className="flex-1 flex items-center justify-center p-8 bg-slate-50/50 dark:bg-slate-950/50">
+          <div className="max-w-4xl w-full text-center space-y-12">
+            <div className="space-y-4">
+              <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-violet-600 via-indigo-600 to-blue-600 bg-clip-text text-transparent sm:text-5xl">
+                Choose your proposal builder
+              </h1>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Select the workspace format that best fits your workflow. You can draft an interactive proposal from scratch or sign an existing PDF.
+              </p>
             </div>
-            <div className="space-y-2">
-              <Label className="text-foreground/80 font-medium">Client Email</Label>
-              <Input
-                type="email"
-                value={proposal.customer_email || ''}
-                onChange={(e) => dispatch({ type: 'UPDATE_METADATA', payload: { customer_email: e.target.value } })}
-                placeholder="client@acme.com"
-                className="focus-visible:ring-primary/50"
-              />
-            </div>
-          </div>
 
-          <h2 className="text-sm font-bold text-primary uppercase tracking-wider mt-8 mb-4 flex items-center gap-2">
-            <span className="bg-primary/10 p-1 rounded">Add Blocks</span>
-          </h2>
-          <div className="space-y-2">
-            {[
-              { type: 'cover', label: 'Cover Page' },
-              { type: 'rich_text', label: 'Text Block' },
-              { type: 'pricing_table', label: 'Pricing Table' },
-              { type: 'signature_block', label: 'Signature' }
-            ].map((blockType) => (
-              <Button
-                key={blockType.type}
-                variant="outline"
-                className="w-full justify-start text-muted-foreground hover:text-primary hover:bg-primary/5 hover:border-primary/20 transition-all"
-                onClick={() => dispatch({ type: 'ADD_BLOCK', payload: { type: blockType.type as any, data: {} } })}
+            <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+              {/* Block Builder Card */}
+              <Card
+                className="glass hover:shadow-2xl hover:shadow-violet-500/10 hover:border-violet-500/50 transition-all duration-300 rounded-3xl overflow-hidden cursor-pointer group flex flex-col"
+                onClick={() => dispatch({ type: 'UPDATE_METADATA', payload: { document_type: 'block' } })}
               >
-                <Plus className="w-4 h-4 mr-2" />
-                {blockType.label}
-              </Button>
-            ))}
-          </div>
-        </aside>
-
-        {/* Document canvas */}
-        <div className="flex-1 overflow-y-auto p-8 bg-gray-50">
-          <div className="max-w-4xl mx-auto space-y-6 pb-32">
-            {(!proposal.sections || proposal.sections.length === 0) ? (
-              <Card className="border-dashed border-2 bg-gradient-to-br from-primary/5 via-transparent to-blue-500/5">
-                <CardContent className="py-32 text-center">
-                  <div className="p-4 bg-white shadow-sm rounded-full mb-4 border border-primary/10 inline-block">
-                    <Plus className="h-8 w-8 text-primary" />
+                <CardContent className="p-8 flex flex-col justify-between flex-1">
+                  <div className="space-y-6">
+                    <div className="w-14 h-14 rounded-2xl bg-violet-50 dark:bg-violet-950/40 text-violet-600 dark:text-violet-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
+                      <BookOpen className="w-7 h-7" />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-bold text-foreground">Interactive Block Builder</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        Design a premium custom proposal block-by-block. Best for dynamic pricing, rich media, and custom web sections.
+                      </p>
+                    </div>
+                    <ul className="text-xs text-muted-foreground/80 space-y-2 text-left max-w-xs mx-auto">
+                      <li className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-violet-500 shrink-0" />
+                        Drag-and-drop structural sections
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-violet-500 shrink-0" />
+                        Dynamic pricing tables
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-violet-500 shrink-0" />
+                        Custom rich text blocks & details
+                      </li>
+                    </ul>
                   </div>
-                  <h3 className="text-xl font-bold text-foreground">Start building</h3>
-                  <p className="text-muted-foreground mt-2 max-w-sm mx-auto">Document is empty. Click a block type from the sidebar on the left to add it here.</p>
+                  <div className="mt-8">
+                    <Button className="w-full bg-violet-600 hover:bg-violet-700 text-white rounded-xl shadow-lg shadow-violet-500/20">
+                      Create Custom Proposal
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
-            ) : (
-              proposal.sections.map((block, index) => (
-                <Card key={block.id} className="relative group hover:shadow-md transition-shadow">
-                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-white/90 backdrop-blur shadow-sm border border-gray-100 rounded-md p-1 z-10">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-gray-500"
-                      onClick={() => dispatch({ type: 'REORDER_BLOCKS', payload: { startIndex: index, endIndex: Math.max(0, index - 1) } })}
-                      disabled={index === 0}
-                    >
-                      <ArrowUp className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-gray-500"
-                      onClick={() => dispatch({ type: 'REORDER_BLOCKS', payload: { startIndex: index, endIndex: Math.min(proposal.sections!.length - 1, index + 1) } })}
-                      disabled={index === proposal.sections!.length - 1}
-                    >
-                      <ArrowDown className="w-4 h-4" />
-                    </Button>
-                    <div className="w-px h-4 bg-gray-200 mx-1" />
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
-                      onClick={() => dispatch({ type: 'REMOVE_BLOCK', payload: block.id })}
-                    >
-                      <X className="w-4 h-4" />
+
+              {/* PDF Uploader Card */}
+              <Card
+                className="glass hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-indigo-500/50 transition-all duration-300 rounded-3xl overflow-hidden cursor-pointer group flex flex-col"
+                onClick={() => dispatch({ type: 'UPDATE_METADATA', payload: { document_type: 'pdf' } })}
+              >
+                <CardContent className="p-8 flex flex-col justify-between flex-1">
+                  <div className="space-y-6">
+                    <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-300">
+                      <FileUp className="w-7 h-7" />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-xl font-bold text-foreground">PDF Document Signer</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        Upload an existing PDF proposal and place interactive fields. Best for quick signing, pre-designed docs, and contracts.
+                      </p>
+                    </div>
+                    <ul className="text-xs text-muted-foreground/80 space-y-2 text-left max-w-xs mx-auto">
+                      <li className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
+                        Upload any standard PDF document
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
+                        DocuSign style drag-and-drop overlay
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
+                        Required/Optional fields mapping
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="mt-8">
+                    <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg shadow-indigo-500/20">
+                      Upload & Place Fields
                     </Button>
                   </div>
-
-                  <CardContent className="p-6">
-                    <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">
-                      {block.type.replace('_', ' ')}
-                    </div>
-                    <BlockRenderer block={block} />
-                  </CardContent>
-                </Card>
-              ))
-            )}
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
-      </main>
+      ) : proposal.document_type === 'pdf' ? (
+        !proposal.document_url ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50/50 dark:bg-slate-950/50">
+            <div className="max-w-2xl w-full space-y-6">
+              <div className="flex items-center justify-between">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => dispatch({ type: 'UPDATE_METADATA', payload: { document_type: undefined } })}
+                  className="text-gray-500 hover:text-primary hover:bg-primary/10 -ml-3"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Change proposal type
+                </Button>
+              </div>
+              <PdfUploader
+                onUploadSuccess={(url) => {
+                  dispatch({
+                    type: 'UPDATE_METADATA',
+                    payload: { document_url: url }
+                  })
+                }}
+              />
+            </div>
+          </div>
+        ) : (
+          <PdfEditor documentUrl={proposal.document_url} />
+        )
+      ) : (
+        <main className="flex-1 flex overflow-hidden">
+          {/* Editor sidebar / Metadata */}
+          <aside className="w-80 bg-white border-r border-gray-200 p-6 overflow-y-auto">
+            <h2 className="text-sm font-bold text-primary uppercase tracking-wider mb-4 flex items-center gap-2">
+              <span className="bg-primary/10 p-1 rounded">Details</span>
+            </h2>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label className="text-foreground/80 font-medium">Client Name</Label>
+                <Input
+                  type="text"
+                  value={proposal.customer_name || ''}
+                  onChange={(e) => dispatch({ type: 'UPDATE_METADATA', payload: { customer_name: e.target.value } })}
+                  placeholder="Acme Corp"
+                  className="focus-visible:ring-primary/50"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-foreground/80 font-medium">Client Email</Label>
+                <Input
+                  type="email"
+                  value={proposal.customer_email || ''}
+                  onChange={(e) => dispatch({ type: 'UPDATE_METADATA', payload: { customer_email: e.target.value } })}
+                  placeholder="client@acme.com"
+                  className="focus-visible:ring-primary/50"
+                />
+              </div>
+            </div>
+
+            <h2 className="text-sm font-bold text-primary uppercase tracking-wider mt-8 mb-4 flex items-center gap-2">
+              <span className="bg-primary/10 p-1 rounded">Add Blocks</span>
+            </h2>
+            <div className="space-y-2">
+              {[
+                { type: 'cover', label: 'Cover Page' },
+                { type: 'rich_text', label: 'Text Block' },
+                { type: 'pricing_table', label: 'Pricing Table' },
+                { type: 'signature_block', label: 'Signature' }
+              ].map((blockType) => (
+                <Button
+                  key={blockType.type}
+                  variant="outline"
+                  className="w-full justify-start text-muted-foreground hover:text-primary hover:bg-primary/5 hover:border-primary/20 transition-all"
+                  onClick={() => dispatch({ type: 'ADD_BLOCK', payload: { type: blockType.type as any, data: {} } })}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  {blockType.label}
+                </Button>
+              ))}
+            </div>
+          </aside>
+
+          {/* Document canvas */}
+          <div className="flex-1 overflow-y-auto p-8 bg-gray-50">
+            <div className="max-w-4xl mx-auto space-y-6 pb-32">
+              {(!proposal.sections || proposal.sections.length === 0) ? (
+                <Card className="border-dashed border-2 bg-gradient-to-br from-primary/5 via-transparent to-blue-500/5">
+                  <CardContent className="py-32 text-center">
+                    <div className="p-4 bg-white shadow-sm rounded-full mb-4 border border-primary/10 inline-block">
+                      <Plus className="h-8 w-8 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-bold text-foreground">Start building</h3>
+                    <p className="text-muted-foreground mt-2 max-w-sm mx-auto">Document is empty. Click a block type from the sidebar on the left to add it here.</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                proposal.sections.map((block, index) => (
+                  <Card key={block.id} className="relative group hover:shadow-md transition-shadow">
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-white/90 backdrop-blur shadow-sm border border-gray-100 rounded-md p-1 z-10">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-gray-500"
+                        onClick={() => dispatch({ type: 'REORDER_BLOCKS', payload: { startIndex: index, endIndex: Math.max(0, index - 1) } })}
+                        disabled={index === 0}
+                      >
+                        <ArrowUp className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-gray-500"
+                        onClick={() => dispatch({ type: 'REORDER_BLOCKS', payload: { startIndex: index, endIndex: Math.min(proposal.sections!.length - 1, index + 1) } })}
+                        disabled={index === proposal.sections!.length - 1}
+                      >
+                        <ArrowDown className="w-4 h-4" />
+                      </Button>
+                      <div className="w-px h-4 bg-gray-200 mx-1" />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+                        onClick={() => dispatch({ type: 'REMOVE_BLOCK', payload: block.id })}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+
+                    <CardContent className="p-6">
+                      <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">
+                        {block.type.replace('_', ' ')}
+                      </div>
+                      <BlockRenderer block={block} />
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          </div>
+        </main>
+      )}
 
       {!isNew && proposal && (
         <ShareProposalModal
